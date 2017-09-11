@@ -54,7 +54,7 @@ class Elaborate extends JFrame {
     private JPanel getBrowserPanel() {
 
         try {
-            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/videos?api_key=78649d641d4f004c03de3691a37fdfa2&language=en-US");
+            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/videos?api_key="+Constants.API_KEY+"&language=en-US");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -204,7 +204,7 @@ class Elaborate extends JFrame {
 
         JPanel reviewPanel = null;
         try {
-            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/reviews?api_key=78649d641d4f004c03de3691a37fdfa2&language=en-US");
+            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/reviews?api_key="+Constants.API_KEY+"&language=en-US");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -271,7 +271,7 @@ class Elaborate extends JFrame {
     private JScrollPane getCrewPanel() throws JSONException {
         JPanel crewPanel = new JPanel();
         try {
-            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/credits?api_key=78649d641d4f004c03de3691a37fdfa2&language=en-US");
+            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/credits?api_key="+Constants.API_KEY+"&language=en-US");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,4 @@
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
-import chrriis.dj.nativeswing.swtimpl.netbeans.NativeInterfaceNetBeansHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +19,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Main extends JFrame implements MouseListener {
     private static URL url;
@@ -92,8 +90,8 @@ public class Main extends JFrame implements MouseListener {
 
         NativeInterface.open();
         try {
-            url = new URL("https://api.themoviedb.org/3/discover/movie?api_key=78649d641d4f004c03de3691a37fdfa2&release_date.gte=2017-05-01&release_date.lte=2017-12-22");
-            url2 = new URL("https://api.themoviedb.org/3/discover/movie?api_key=78649d641d4f004c03de3691a37fdfa2&release_date.gte=2017-05-01&release_date.lte=2017-12-22&page=2");
+            url = new URL("https://api.themoviedb.org/3/discover/movie?api_key="+Constants.API_KEY+"&release_date.gte=2017-05-01&release_date.lte=2017-12-22");
+            url2 = new URL("https://api.themoviedb.org/3/discover/movie?api_key="+Constants.API_KEY+"&release_date.gte=2017-05-01&release_date.lte=2017-12-22&page=2");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -221,12 +219,7 @@ public class Main extends JFrame implements MouseListener {
 
         NativeInterface.runEventPump();
         // don't forget to properly close native components
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                NativeInterface.close();
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(NativeInterface::close));
 
     }
 
@@ -255,7 +248,7 @@ public class Main extends JFrame implements MouseListener {
 
         String searchQuery = searchArea.getText().trim();
         try {
-            url = new URL("https://api.themoviedb.org/3/search/movie?api_key=78649d641d4f004c03de3691a37fdfa2&query=" + searchQuery);
+            url = new URL("https://api.themoviedb.org/3/search/movie?api_key="+Constants.API_KEY+"&query=" + searchQuery);
         } catch (MalformedURLException e1) {
             e1.printStackTrace();
         }
