@@ -10,7 +10,7 @@ Informations of a movie displayed to user :
 2. Movie Poster
 3. Backdrop poster
 4. Average Voting%
-5. lease date
+5. Release date
 6. Movie trailer
 7. Movie crew and cast
 8. Movie reviews
