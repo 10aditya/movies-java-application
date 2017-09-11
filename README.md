@@ -18,3 +18,6 @@ Informations of a movie displayed to user :
 This project is using TMDb API (https://www.themoviedb.org/documentation/api).
 
 I have used JSON library to extract data received from data base and DJNative Swing library to embed YouTube trailer.
+
+P.S. The application will run on IntellIj IDEA and will require a TMDb API key.
+After you get API key from TMDb site, goto src->Constants.java and set value of API_KEY to your API key.
