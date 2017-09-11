@@ -5,13 +5,15 @@
 ->Also, user can search for a movie to get its info. 
 
 Informations of a movie displayed to user :
-1. Movie Poster
-2. Backdrop poster
-3. Average Voting%
-4. Release date
-5. Movie trailer
-6. Movie crew and cast
-7. Movie reviews
+
+1. Movie Title
+2. Movie Poster
+3. Backdrop poster
+4. Average Voting%
+5. lease date
+6. Movie trailer
+7. Movie crew and cast
+8. Movie reviews
 
 This project is using TMDb API (https://www.themoviedb.org/documentation/api).
 
