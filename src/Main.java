@@ -82,11 +82,6 @@ public class Main extends JFrame implements MouseListener {
     }
 
     public static void main(String[] a) throws IOException {
-        /*final String BASE_URL = "http://api.themoviedb.org/3/";
-        final String Movie_SEGEMENT = "movie";
-        final String API_KEY = "78649d641d4f004c03de3691a37fdfa2";
-        final String API_KEY_PARAM = "api_key";
-        final String DISCOVER = "discover";*/
 
         NativeInterface.open();
         try {
