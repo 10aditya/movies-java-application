@@ -61,12 +61,12 @@ public class Main extends JFrame implements MouseListener {
         String status = null;
         for (int i = 0; i < resultArray.length(); i++) {
             JSONObject movieItem = resultArray.getJSONObject(i);
-            String movieTitle = movieItem.getString(MOVIE_TITLE);
-            String releaseDate = movieItem.getString(RELEASE_DATE);
-            String overView = movieItem.getString(OVERVIEW);
-            double rating = movieItem.getDouble(RATING);
-            double popularity = movieItem.getDouble(POPULARITY);
-            String posterURL = movieItem.getString(POSTER_URL);
+            String movieTitle = movieItem.get(MOVIE_TITLE)==null?null:movieItem.getString(MOVIE_TITLE);
+            String releaseDate = movieItem.get(RELEASE_DATE)==null?null:movieItem.getString(RELEASE_DATE);
+            String overView = movieItem.get(OVERVIEW)==null?null:movieItem.getString(OVERVIEW);
+            double rating = movieItem.get(RATING)==null?null:movieItem.getDouble(RATING);
+            double popularity = movieItem.get(POPULARITY)==null?null:movieItem.getDouble(POPULARITY);
+            String posterURL = movieItem.get(POSTER_URL)==null?null:movieItem.getString(POSTER_URL);
             try {
                 backdropURL = movieItem.getString(BACKDROP_URL);
             } catch (Exception ignored) {
