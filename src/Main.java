@@ -23,8 +23,7 @@ import java.util.ArrayList;
 public class Main extends JFrame implements MouseListener {
     private static URL url;
     private static ArrayList<MovieModel> movies;
-    private static ArrayList<MovieModel> movieItems = new ArrayList<>();
-    private static String backdropURL;
+    private static String backdropURL, posterURL;
     private static URL url2;
     private static ArrayList<MovieModel> movies2;
     private static JPanel pl;
@@ -33,6 +32,7 @@ public class Main extends JFrame implements MouseListener {
     private JButton button;
     private JTextArea searchArea;
     private static JPanel sc = new JPanel();
+    private ArrayList<MovieModel> searchResult;
 
     private Main() {
         addWindowListener(new WindowAdapter() {
@@ -55,19 +55,21 @@ public class Main extends JFrame implements MouseListener {
         final String POPULARITY = "popularity";
         final String ID = "id";
 
+        ArrayList<MovieModel> movieItems = new ArrayList<>();
+
         JSONObject jsonData = new JSONObject(data);
         JSONArray resultArray = jsonData.getJSONArray(RESULT_ARRAY);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String status = null;
+
         for (int i = 0; i < resultArray.length(); i++) {
             JSONObject movieItem = resultArray.getJSONObject(i);
-            String movieTitle = movieItem.getString(MOVIE_TITLE);
-            String releaseDate = movieItem.getString(RELEASE_DATE);
-            String overView = movieItem.getString(OVERVIEW);
+            String movieTitle = movieItem.get(MOVIE_TITLE) == null ? null : movieItem.getString(MOVIE_TITLE);
+            String releaseDate = movieItem.get(RELEASE_DATE) == null ? null : movieItem.getString(RELEASE_DATE);
+            String overView = movieItem.get(OVERVIEW) == null ? null : movieItem.getString(OVERVIEW);
             double rating = movieItem.getDouble(RATING);
             double popularity = movieItem.getDouble(POPULARITY);
-            String posterURL = movieItem.getString(POSTER_URL);
+
             try {
+                posterURL = movieItem.getString(POSTER_URL);
                 backdropURL = movieItem.getString(BACKDROP_URL);
             } catch (Exception ignored) {
 
@@ -81,59 +83,64 @@ public class Main extends JFrame implements MouseListener {
         return movieItems;
     }
 
-    public static void main(String[] a) throws IOException {
-        /*final String BASE_URL = "http://api.themoviedb.org/3/";
-        final String Movie_SEGEMENT = "movie";
-        final String API_KEY = "78649d641d4f004c03de3691a37fdfa2";
-        final String API_KEY_PARAM = "api_key";
-        final String DISCOVER = "discover";*/
-
-        NativeInterface.open();
+    static String getJSONstr(String link) throws JSONException, ParseException {
         try {
-            url = new URL("https://api.themoviedb.org/3/discover/movie?api_key="+Constants.API_KEY+"&release_date.gte=2017-05-01&release_date.lte=2017-12-22");
-            url2 = new URL("https://api.themoviedb.org/3/discover/movie?api_key="+Constants.API_KEY+"&release_date.gte=2017-05-01&release_date.lte=2017-12-22&page=2");
+            url = new URL(link);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
+        String JSONstr = null;
         try {
             HttpURLConnection client = (HttpURLConnection) url.openConnection();
-            HttpURLConnection client2 = (HttpURLConnection) url2.openConnection();
 
             client.setRequestMethod("GET");
-            client2.setRequestMethod("GET");
 
             client.connect();
-            client2.connect();
 
             InputStream inputStream = client.getInputStream();
-            InputStream inputStream2 = client2.getInputStream();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder builder = new StringBuilder();
 
-            BufferedReader reader2 = new BufferedReader(new InputStreamReader(inputStream2));
-            StringBuilder builder2 = new StringBuilder();
+            String line;
 
-            String line, line2;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
             }
-            while ((line2 = reader2.readLine()) != null) {
-                builder2.append(line2);
-            }
 
-            String JSONstr = builder.toString();
-            String JSONstr2 = builder2.toString();
+            JSONstr = builder.toString();
 
-            movies = getJSON(JSONstr);
-            movies2 = getJSON(JSONstr2);
             System.out.println(JSONstr);
-            // return getJSON(JSONstr);
-        } catch (IOException | ParseException | JSONException e) {
+
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        return JSONstr;
+    }
 
+    public static void main(String[] a) throws IOException, JSONException, ParseException {
+
+
+        NativeInterface.open();
+
+        String linkToFirst20Movies = Constants.BASE_URL
+                + Constants.DISCOVER
+                + Constants.MOVIE_SEGMENT
+                + Constants.API_KEY_PARAM
+                + Constants.API_KEY
+                + "&release_date.gte=2017-05-01&release_date.lte=2017-12-22";
+
+        String linkToNext20Movies = Constants.BASE_URL
+                + Constants.DISCOVER
+                + Constants.MOVIE_SEGMENT
+                + Constants.API_KEY_PARAM
+                + Constants.API_KEY
+                + "&release_date.gte=2017-05-01&release_date.lte=2017-12-22&page=2";
+
+        movies = getJSON(getJSONstr(linkToFirst20Movies));
+        //movies2 = getJSON(getJSONstr(linkToNext20Movies));
 
         for (MovieModel movy : movies) {
             System.out.println(movy.getTitle());
@@ -143,7 +150,6 @@ public class Main extends JFrame implements MouseListener {
         JPanel container = new JPanel();
         container.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Discover"));
 
-
         sc.setLayout(new GridLayout(1, 2));
         container.setLayout(new GridBagLayout());
         frame.add(sc, BorderLayout.CENTER);
@@ -152,6 +158,7 @@ public class Main extends JFrame implements MouseListener {
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.insets = new Insets(10, 0, 10, 10);
         int i = 1;
+
         for (MovieModel model : movies) {
             MovieCard movieCard = null;
             try {
@@ -163,21 +170,19 @@ public class Main extends JFrame implements MouseListener {
                 container.add(movieCard.getPanel(), constraints);
             }
             i++;
-         //   if (i == 4) break;
+            if (i > 4) break;
             constraints.gridx = (constraints.gridx + 1) % 2;
             if (constraints.gridx == 0) constraints.gridy++;
         }
+
         container.setBackground(Color.LIGHT_GRAY);
         constraints = new GridBagConstraints();
         constraints.gridy = 0;
         constraints.gridx = 0;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         JScrollPane jScrollPane = new JScrollPane(container, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        //jScrollPane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
-        //jScrollPane.setAlignmentY(JScrollPane.TOP_ALIGNMENT);
         jScrollPane.setPreferredSize(new Dimension((int) (Constants.dimension.width * 0.5) + 300, Constants.dimension.height));
 
-        //constraints.gridwidth = (int) (Constants.dimension.width * 0.5) + 400;
         sc.add(jScrollPane, constraints);
 
 
@@ -187,13 +192,10 @@ public class Main extends JFrame implements MouseListener {
         Box box1 = Box.createHorizontalBox();
 
         box1.setBackground(Color.LIGHT_GRAY);
-        //box.setPreferredSize(new Dimension(250, 50));
         box1.add(Box.createRigidArea(new Dimension(20, 50)));
         JTextArea searchArea = new JTextArea();
         searchArea.setBackground(Color.WHITE);
         searchArea.setPreferredSize(new Dimension(200, 50));
-
-        //  box1.add(getSearchPanel());
 
         JPanel na = new JPanel();
         na.setLayout(new GridBagLayout());
@@ -218,24 +220,21 @@ public class Main extends JFrame implements MouseListener {
 
 
         NativeInterface.runEventPump();
-        // don't forget to properly close native components
         Runtime.getRuntime().addShutdownHook(new Thread(NativeInterface::close));
-
     }
 
     private JPanel getSearchPanel() {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(450, 100));
-        //panel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.NORTH;
         constraints.gridx = constraints.gridy = 0;
         searchArea = new JTextArea();
         searchArea.setBackground(Color.WHITE);
-        searchArea.setPreferredSize(new Dimension(250, 25));
+        searchArea.setFont(searchArea.getFont().deriveFont(18.0f));
+        searchArea.setPreferredSize(new Dimension(250, 35));
         panel.add(searchArea);
         button = new JButton("Search");
-        // button.setPreferredSize(new Dimension(75, 25));
         button.addMouseListener(this);
         constraints.gridy = 1;
         panel.add(button);
@@ -247,44 +246,49 @@ public class Main extends JFrame implements MouseListener {
     public void mouseClicked(MouseEvent e) {
 
         String searchQuery = searchArea.getText().trim();
+        String linkToSearchMovie = Constants.BASE_URL
+                + Constants.SEARCH
+                + Constants.MOVIE_SEGMENT
+                + Constants.API_KEY_PARAM
+                + Constants.API_KEY
+                + Constants.QUERY_PARAM
+                + searchQuery;
+
+
         try {
-            url = new URL("https://api.themoviedb.org/3/search/movie?api_key="+Constants.API_KEY+"&query=" + searchQuery);
-        } catch (MalformedURLException e1) {
+            searchResult = getJSON(getJSONstr(linkToSearchMovie));
+        } catch (JSONException | ParseException e1) {
             e1.printStackTrace();
         }
 
-        HttpURLConnection client;
-        try {
-            client = (HttpURLConnection) url.openConnection();
-            client.setRequestMethod("GET");
+        JFrame frame = new JFrame("Movies");
 
-
-            client.connect();
-
-            InputStream inputStream = client.getInputStream();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder builder = new StringBuilder();
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
+        JPanel container = new JPanel();
+        container.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridx = c.gridy = 0;
+        c.insets = new Insets(10, 10, 10, 10);
+        for (MovieModel model : searchResult) {
+            try {
+                MovieCard card = new MovieCard(model);
+                container.add(card.getPanel(), c);
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
-
-            String JSONstr = builder.toString();
-
-            JSONObject jsonData = new JSONObject(JSONstr);
-            JSONstr = jsonData.toString();
-
-            ArrayList<MovieModel> mo = getJSON(JSONstr);
-            constraints.gridy = 1;
-            constraints.gridx = 1;
-            sc.add(new MovieCard(mo.get(0)), constraints);
-
-        } catch (IOException | JSONException | ParseException ee) {
-            ee.printStackTrace();
+            c.gridy = c.gridy + 1;
         }
 
+        container.setBackground(Color.LIGHT_GRAY);
+
+        JScrollPane pane = new JScrollPane(container, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        frame.add(pane);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.pack();
+        frame.setExtendedState(MAXIMIZED_BOTH);
+
+        frame.setVisible(true);
 
     }
 

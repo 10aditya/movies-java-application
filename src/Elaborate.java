@@ -1,4 +1,5 @@
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import org.eclipse.swt.internal.C;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 
 class Elaborate extends JFrame {
     private static URL url;
@@ -53,48 +55,35 @@ class Elaborate extends JFrame {
 
     private JPanel getBrowserPanel() {
 
+
+        String url = Constants.BASE_URL
+                + Constants.MOVIE_SEGMENT
+                + "/"
+                + String.valueOf(model.getId())
+                + Constants.VIDEO_SEGMENT
+                + Constants.API_KEY_PARAM
+                + Constants.API_KEY
+                + Constants.LANGUAGE_QUERY;
+
+
+        String JSONstr;
         try {
-            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/videos?api_key="+Constants.API_KEY+"&language=en-US");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        HttpURLConnection client;
-        try {
-            client = (HttpURLConnection) url.openConnection();
-            client.setRequestMethod("GET");
-
-
-            client.connect();
-
-            InputStream inputStream = client.getInputStream();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder builder = new StringBuilder();
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-
-            String JSONstr = builder.toString();
-
+            JSONstr = Main.getJSONstr(url);
             JSONObject jsonData = new JSONObject(JSONstr);
             JSONArray resultArray = jsonData.getJSONArray("results");
             JSONObject item = resultArray.getJSONObject(0);
             trailerID = item.getString("key");
 
-        } catch (IOException | JSONException e) {
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
-
         JPanel webBrowserPanel = new JPanel(new BorderLayout());
         JWebBrowser webBrowser = new JWebBrowser();
         webBrowser.setPreferredSize(new Dimension((int) (Constants.dimension.width * 0.5) - 100,
                 400));
         webBrowserPanel.add(webBrowser, BorderLayout.CENTER);
         webBrowser.setBarsVisible(false);
-        String link = "https://www.youtube.com/v/" + trailerID + "?fs=1";
+        String link = "https://www.youtube.com/watch_popup?v=" + trailerID;
         webBrowser.navigate(link);
         return webBrowserPanel;
     }
@@ -203,34 +192,24 @@ class Elaborate extends JFrame {
     private JPanel getReviewsPanel() {
 
         JPanel reviewPanel = null;
+        String url = Constants.BASE_URL
+                + Constants.MOVIE_SEGMENT
+                + "/"
+                + String.valueOf(model.getId())
+                + Constants.REVIEW_SEGMENT
+                + Constants.API_KEY_PARAM
+                + Constants.API_KEY
+                + Constants.LANGUAGE_QUERY;
+
+        String JSONstr;
+        JSONArray resultArray = null;
         try {
-            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/reviews?api_key="+Constants.API_KEY+"&language=en-US");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        HttpURLConnection client;
-        try {
-            client = (HttpURLConnection) url.openConnection();
-            client.setRequestMethod("GET");
-
-            client.connect();
-
-            InputStream inputStream = client.getInputStream();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder builder = new StringBuilder();
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-
-            String JSONstr = builder.toString();
-
+            JSONstr = Main.getJSONstr(url);
             JSONObject jsonData = new JSONObject(JSONstr);
-            JSONArray resultArray = jsonData.getJSONArray("results");
+            resultArray = jsonData.getJSONArray("results");
 
+
+            assert resultArray != null;
             if (resultArray.length() == 0) return null;
 
             reviewPanel = new JPanel();
@@ -262,38 +241,27 @@ class Elaborate extends JFrame {
                 reviewPanel.add(pane, constraints);
                 constraints.gridx++;
             }
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException | ParseException e1) {
+            e1.printStackTrace();
         }
+
         return reviewPanel;
     }
 
     private JScrollPane getCrewPanel() throws JSONException {
         JPanel crewPanel = new JPanel();
+
+        String url = Constants.BASE_URL
+                + Constants.MOVIE_SEGMENT
+                + "/"
+                + String.valueOf(model.getId())
+                + Constants.CREDITS_SEGMENT
+                + Constants.API_KEY_PARAM
+                + Constants.API_KEY
+                + Constants.LANGUAGE_QUERY;
         try {
-            url = new URL("https://api.themoviedb.org/3/movie/" + String.valueOf(model.getId()) + "/credits?api_key="+Constants.API_KEY+"&language=en-US");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
-        HttpURLConnection client;
-        try {
-            client = (HttpURLConnection) url.openConnection();
-            client.setRequestMethod("GET");
-
-            client.connect();
-
-            InputStream inputStream = client.getInputStream();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder builder = new StringBuilder();
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-
-            String JSONstr = builder.toString();
+            String JSONstr = Main.getJSONstr(url);
 
             JSONObject jsonData = new JSONObject(JSONstr);
             JSONArray resultArray = jsonData.getJSONArray("crew");
@@ -331,13 +299,13 @@ class Elaborate extends JFrame {
                 JSONObject item = resultArray.getJSONObject(i);
                 crewPanel.add(getPeoplePanel(item.getString("name"),
                         item.getString("character"),
-                        item.get("profile_path")==null ? null : String.valueOf(item.get("profile_path")),
+                        item.get("profile_path") == null ? null : String.valueOf(item.get("profile_path")),
                         1),
                         constraints);
                 constraints.gridx++;
             }
 
-        } catch (IOException | JSONException e) {
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
 
