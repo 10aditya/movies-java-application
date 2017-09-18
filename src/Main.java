@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Main extends JFrame implements MouseListener {
     private static URL url;
@@ -217,6 +218,7 @@ public class Main extends JFrame implements MouseListener {
         Box box2 = Box.createHorizontalBox();
         box2.add(box);
         JPanel pl = new Main().getSearchPanel();
+        pl.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Search"));
         box2.add(pl, gridBagConstraints);
         sc.add(box2, constraints);
         frame.add(sc);
@@ -256,6 +258,7 @@ public class Main extends JFrame implements MouseListener {
     public void mouseClicked(MouseEvent e) {
 
         String searchQuery = searchArea.getText().trim();
+        if ((searchQuery != null) || (!Objects.equals(searchQuery, ""))) return;
         String linkToSearchMovie = Constants.BASE_URL
                 + Constants.SEARCH
                 + Constants.MOVIE_SEGMENT
