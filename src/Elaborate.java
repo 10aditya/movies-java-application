@@ -1,19 +1,14 @@
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
-import org.eclipse.swt.internal.C;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Objects;
 
 class Elaborate extends JFrame {
     private static URL url;
@@ -324,7 +319,7 @@ class Elaborate extends JFrame {
         JLabel photo = new JLabel(
                 new ImageIcon(Toolkit.getDefaultToolkit().getImage("default contact.jpg")
                         .getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
-        new ImageLoader(photo, "https://image.tmdb.org/t/p/original" + photoPath, 4).execute();
+        new ImageLoader(photo, Objects.equals(photoPath, "null") ? null : "https://image.tmdb.org/t/p/original" + photoPath, 4).execute();
 
         JPanel peoplePanel = new JPanel();
         peoplePanel.setPreferredSize(new Dimension(200, 200));

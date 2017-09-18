@@ -17,19 +17,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class Main extends JFrame implements MouseListener {
     private static URL url;
-    private static ArrayList<MovieModel> movies;
     private static String backdropURL, posterURL;
-    private static URL url2;
-    private static ArrayList<MovieModel> movies2;
-    private static JPanel pl;
-    private static GridBagConstraints gridBagConstraints;
-    private static GridBagConstraints constraints;
-    private JButton button;
     private JTextArea searchArea;
     private static JPanel sc = new JPanel();
     private ArrayList<MovieModel> searchResult;
@@ -139,8 +131,8 @@ public class Main extends JFrame implements MouseListener {
                 + Constants.API_KEY
                 + "&release_date.gte=2017-05-01&release_date.lte=2017-12-22&page=2";
 
-        movies = getJSON(getJSONstr(linkToFirst20Movies));
-        //movies2 = getJSON(getJSONstr(linkToNext20Movies));
+        ArrayList<MovieModel> movies = getJSON(getJSONstr(linkToFirst20Movies));
+        ArrayList<MovieModel> movies2 = getJSON(getJSONstr(linkToNext20Movies));
 
         for (MovieModel movy : movies) {
             System.out.println(movy.getTitle());
@@ -153,7 +145,8 @@ public class Main extends JFrame implements MouseListener {
         sc.setLayout(new GridLayout(1, 2));
         container.setLayout(new GridBagLayout());
         frame.add(sc, BorderLayout.CENTER);
-        constraints = new GridBagConstraints();
+
+        GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = constraints.gridx = 0;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.insets = new Insets(10, 0, 10, 10);
@@ -170,7 +163,23 @@ public class Main extends JFrame implements MouseListener {
                 container.add(movieCard.getPanel(), constraints);
             }
             i++;
-            if (i > 4) break;
+            //   if (i > 4) break;
+            constraints.gridx = (constraints.gridx + 1) % 2;
+            if (constraints.gridx == 0) constraints.gridy++;
+        }
+
+        for (MovieModel model : movies2) {
+            MovieCard movieCard = null;
+            try {
+                movieCard = new MovieCard(model);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (movieCard != null) {
+                container.add(movieCard.getPanel(), constraints);
+            }
+            i++;
+            //   if (i > 4) break;
             constraints.gridx = (constraints.gridx + 1) % 2;
             if (constraints.gridx == 0) constraints.gridy++;
         }
@@ -199,14 +208,15 @@ public class Main extends JFrame implements MouseListener {
 
         JPanel na = new JPanel();
         na.setLayout(new GridBagLayout());
-        gridBagConstraints = new GridBagConstraints();
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = constraints.gridy = 0;
         na.add(new Main().getSearchPanel(), gridBagConstraints);
 
         Box box2 = Box.createHorizontalBox();
         box2.add(box);
-        pl = new Main().getSearchPanel();
+        JPanel pl = new Main().getSearchPanel();
         box2.add(pl, gridBagConstraints);
         sc.add(box2, constraints);
         frame.add(sc);
@@ -234,7 +244,7 @@ public class Main extends JFrame implements MouseListener {
         searchArea.setFont(searchArea.getFont().deriveFont(18.0f));
         searchArea.setPreferredSize(new Dimension(250, 35));
         panel.add(searchArea);
-        button = new JButton("Search");
+        JButton button = new JButton("Search");
         button.addMouseListener(this);
         constraints.gridy = 1;
         panel.add(button);

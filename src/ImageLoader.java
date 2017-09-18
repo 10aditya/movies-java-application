@@ -20,7 +20,8 @@ class ImageLoader extends SwingWorker<BufferedImage, String> {
 
     @Override
     protected BufferedImage doInBackground() throws Exception {
-        return imageURL != null ? ImageIO.read(new URL(imageURL)) : null;
+        assert imageURL != null;
+        return ImageIO.read(new URL(imageURL));
     }
 
     @Override
@@ -42,6 +43,7 @@ class ImageLoader extends SwingWorker<BufferedImage, String> {
             h = 100;
         }
         try {
+            assert get()!=null;
             BufferedImage bufferedImage = get();
             if (bufferedImage == null) return;
             BufferedImage finalImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
