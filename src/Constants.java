@@ -4,7 +4,7 @@ import java.awt.Toolkit;
 class Constants {
 
     final static Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-    final static String API_KEY = "78649d641d4f004c03de3691a37fdfa2";
+    final static String API_KEY = "API_KEY";
     final static String BASE_URL = "http://api.themoviedb.org/3/";
     final static String MOVIE_SEGMENT = "movie";
     final static String API_KEY_PARAM = "?api_key=";
